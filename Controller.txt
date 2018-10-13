@@ -1,0 +1,257 @@
+public class GoogleSearchcontroller {
+    public list<account> accountList{get;set;}
+    public list<contact> contactList{get;set;}
+    public list<opportunity> opportunityList{get;set;}
+    public list<Lead> LeadList{get;set;}
+    public string ImageUrl{get;set;}
+    public string SearchText{get;set;}
+    public string GlobalText{get;set;}
+    public boolean accountflag{get;set;}
+    public boolean contactflag{get;set;}
+    public boolean oppflag{get;set;}
+    public boolean leadflag{get;set;}
+    public boolean pblock{get;set;}
+    public boolean formflag{get;set;}
+    // boolean to show matching record
+    public boolean accountflag2{get;set;}
+    public boolean contactflag2{get;set;}
+    public boolean oppflag2{get;set;}
+    public boolean leadflag2{get;set;}
+    //define variable for custom pagination
+    public integer counter{get;set;}
+    public integer listsize{get;set;}  
+    public integer totalsize{get;set;} 
+    public integer recordcount{get;set;} 
+    public boolean showbutton {get;set;}
+    
+   //class controller 
+   
+    public GoogleSearchcontroller(){
+        showbutton = false;
+        accountflag = false;
+        accountflag2 = false;
+        contactflag = false;
+        contactflag2 = false;
+        oppflag = false;
+        oppflag2 = false;
+        leadflag = false;
+        leadflag2 = false;
+        pblock = false;
+        formflag = true;
+        accountList = new list<account>();
+        contactList = new list<contact>();
+        opportunityList = new list<opportunity>();
+        LeadList= new list<lead>();
+        counter=0;
+        listsize=10;
+        SearchText='';
+       // totalsize = 0;
+                        
+    }
+    
+    //Webite Logo Method
+    public pagereference showLogo(){
+        ImageUrl = SearchText;
+        return null;  
+    }
+    
+    // List method to get object list
+    
+    public void ListSearch(){
+    showbutton = true; 
+    recordcount =10;
+        
+        if(SearchText=='account')
+        totalsize=[select count() from account];
+        
+        if(SearchText=='contact')
+        totalsize=[select count() from contact];
+        
+        
+        if(SearchText=='opportunity')
+        totalsize=[select count() from opportunity];
+        
+        
+        if(SearchText=='Lead')
+        totalsize=[select count() from Lead];       
+        if(SearchText!=null && SearchText!=''){
+        if(SearchText=='account'){
+            accountList = [select id,name,phone,Industry from account order by name limit :listsize];
+            
+            accountflag=true;
+            formflag = false;
+            pblock=true;            
+            contactflag = false;
+            oppflag = false;
+            leadflag = false;
+            accountflag2 = false;
+            contactflag2 = false;
+            oppflag2 = false;
+            leadflag2 = false;     
+        }else if(SearchText=='contact'){
+            contactList = [select id,name,lastname,phone from contact order by name limit :listsize offset :counter];
+            contactflag = true;
+            formflag = false;
+            pblock=true;            
+            accountflag=false;
+            oppflag = false;
+            leadflag = false;
+            accountflag2 = false;
+            contactflag2 = false;
+            oppflag2 = false;
+            leadflag2 = false;         
+        }else if(SearchText=='opportunity'){
+            opportunityList = [select id,name,stagename,CloseDate from opportunity order by name limit :listsize offset :counter];
+            oppflag = true;
+            formflag = false;
+            pblock=true;
+            contactflag = false;
+            accountflag=false;
+            leadflag = false;
+            accountflag2 = false;
+            contactflag2 = false;
+            oppflag2 = false;
+            leadflag2 = false;        
+        }else if(SearchText=='lead'){
+            LeadList = [select id,name,lastname,company from lead order by name limit :listsize offset :counter];
+            leadflag = true;
+            formflag = false;
+            pblock=true;
+            contactflag = false;
+            accountflag=false;
+            oppflag = false;
+            accountflag2 = false;
+            contactflag2 = false;
+            oppflag2 = false;
+            leadflag2 = false;      
+        }else{
+          ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.ERROR,'Did Not Match from Any Object In Salesforce Org......');
+          ApexPages.addMessage(myMsg);
+          }
+          }else{
+          ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.ERROR,'Please Insert data......');
+          ApexPages.addMessage(myMsg);
+          }
+     //Pagination methods------------------------------------------------------------------------------------------------------------   
+    }
+            
+    public void nextbutton(){
+   
+        counter +=listsize;
+        if(SearchText=='account'){
+        accountList = [select id,name,phone,Industry from account order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Contact'){
+        ContactList = [select id,name,lastname,phone from Contact order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Opportunity'){
+        OpportunityList = [select id,name,stagename,CloseDate from Opportunity order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='lead'){
+        LeadList = [select id,name,lastname,company from Lead order by name limit :listsize offset :counter];
+        }
+            if(counter==(totalsize-math.mod(totalsize,listsize))){
+            
+            recordcount = math.mod(totalsize,listsize)+counter ;
+            }else {
+            recordcount = listsize+counter;
+            }
+        
+    }
+    public void previousbutton(){
+        counter -=listsize;
+        if(SearchText=='account'){
+        accountList = [select id,name,phone,Industry from account order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Contact'){
+        ContactList = [select id,name,lastname,phone from Contact order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Opportunity'){
+        OpportunityList = [select id,name,stagename,CloseDate from Opportunity order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='lead'){
+        LeadList = [select id,name,lastname,company from Lead order by name limit :listsize offset :counter];
+        }
+          
+         recordcount = listsize+counter;
+    }
+    
+    public void firstpage(){
+        counter =0;
+        if(SearchText=='account'){
+        accountList = [select id,name,phone,Industry from account order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Contact'){
+        ContactList = [select id,name,lastname,phone from Contact order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Opportunity'){
+        OpportunityList = [select id,name,stagename,CloseDate from Opportunity order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='lead'){
+        LeadList = [select id,name,lastname,company from Lead order by name limit :listsize offset :counter];
+        }
+          
+         recordcount = listsize+counter;
+    }
+    public void lastpage(){
+        counter = totalsize - math.mod(totalsize,listsize);
+if(SearchText=='account'){
+        accountList = [select id,name,phone,Industry from account order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Contact'){
+        ContactList = [select id,name,lastname,phone from Contact order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='Opportunity'){
+        OpportunityList = [select id,name,stagename,CloseDate from Opportunity order by name limit :listsize offset :counter];
+        }
+        if(SearchText=='lead'){
+        LeadList = [select id,name,lastname,company from Lead order by name limit :listsize offset :counter];
+        }
+                   recordcount = totalsize;
+    }
+    public boolean getlastnextdisable(){
+       if(recordcount== totalsize)
+       return true;
+       else
+       return false;
+    }
+    public boolean getfirstpreviousdisable(){
+        if(counter ==0)
+        return true;
+        else
+        return false;
+    }
+    
+    //SearchRecord method to show matching record by name    
+    
+    public void SearchRecord(){
+        String s= SearchText+'%';
+        if(SearchText!=null && SearchText!=''&& !SearchText.contains('.')){
+            accountList = [select id,name,phone,Industry from account where name like :s limit 5];
+            contactList = [select id,name,lastname,phone from contact where name like :s limit 5];
+            opportunityList = [select id,name,stagename,CloseDate from opportunity where name like:s limit 5];
+            LeadList = [select id,name,lastname,company from lead where name like:s limit 5];
+            accountflag2=true;
+            contactflag2 = true;
+            oppflag2 = true;
+            leadflag2 = true;
+            formflag = false;
+            pblock=true;         
+        }else{
+            ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.ERROR,'Incorrect data......');
+            ApexPages.addMessage(myMsg);
+        }
+    }
+    
+    public pagereference home(){
+        accountList.clear();
+        contactList.clear();
+        opportunityList.clear();
+        LeadList.clear();
+        formflag = true;
+        pblock = false;
+        SearchText ='';
+        return null;    
+    } 
+    
+}
